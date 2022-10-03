@@ -32,13 +32,14 @@ struct MainComponent  :
     MainComponent() :
         FileDragAndDropTarget(),
         text("drop folder of\naudio files here"),
+        destPath(""),
         tracks(),
         trackTitles()
     {
         setSize(600, 400);
     }
 
-    String text;
+    String text, destPath;
     std::vector<AudioBuffer> tracks;
     std::vector<String> trackTitles;
     std::vector<double> sampleRates;
@@ -81,15 +82,17 @@ struct MainComponent  :
         auto minPeak = 1.f;
         auto maxPeak = 0.f;
 
+        auto seperatorString = File::getSeparatorString();
+
         for (auto i = 0; i < numTracks; ++i)
         {
             auto& track = tracks[i];
             auto& trackTitle = trackTitles[i];
             auto& Fs = sampleRates[i];
             const auto& file = files[i];
+			destPath = file.upToLastOccurrenceOf(seperatorString, false, false) + "\\BatchNormalizeOutput\\";
             loadAudioFile(file, track, Fs);
-
-            auto seperatorString = File::getSeparatorString();
+			
 			trackTitle = file.fromLastOccurrenceOf(seperatorString, false, false);
             trackTitle = trackTitle.upToLastOccurrenceOf(".", false, false);
 
@@ -116,6 +119,7 @@ struct MainComponent  :
         const auto gain = Decibels::decibelsToGain(-1.f) / maxPeak;
 
 		text += "Added Gain: " + String(gain) + " :: " + String(Decibels::gainToDecibels(gain)) + "db\n";
+        text += "Saved to: " + destPath;
 
         for (auto i = 0; i < numTracks; ++i)
         {
@@ -157,14 +161,10 @@ struct MainComponent  :
 
     void saveWav(const AudioBuffer& buffer, const String& title, double Fs)
     {
-        const auto path = juce::File::getSpecialLocation
-        (
-            File::SpecialLocationType::userDesktopDirectory
-        ).getFullPathName() + "\\BatchNormalizeOutput\\";
-        File file(path);
+        File file(destPath);
         file.createDirectory();
         const auto fullName = title + ".wav";
-        file = File(path + "\\" + fullName);
+        file = File(destPath + "\\" + fullName);
         if (file.existsAsFile())
             file.deleteFile();
         WavAudioFormat format;
