@@ -4,13 +4,15 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="dMeAbh" name="BatchNormalize">
     <GROUP id="{257A55A0-4BF9-36ED-9068-45DC15CCBFD9}" name="Source">
+      <FILE id="jscWkt" name="batchNormIcon.png" compile="0" resource="1"
+            file="Source/batchNormIcon.png"/>
       <FILE id="fKPrqH" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="xyGl94" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
-    <VS2022 targetFolder="Builds/VisualStudio2022">
+    <VS2022 targetFolder="Builds/VisualStudio2022" smallIcon="jscWkt" bigIcon="jscWkt">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="BatchNormalize"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="BatchNormalize"/>

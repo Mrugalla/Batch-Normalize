@@ -1,5 +1,4 @@
 #pragma once
-
 #include <JuceHeader.h>
 
 struct MainComponent  :
@@ -7,6 +6,7 @@ struct MainComponent  :
     public juce::FileDragAndDropTarget
 {
     using Graphics = juce::Graphics;
+	using Just = juce::Justification;
     using Colour = juce::Colour;
     using Image = juce::Image;
     using DnDSrc = juce::DragAndDropTarget::SourceDetails;
@@ -44,12 +44,12 @@ struct MainComponent  :
     std::vector<String> trackTitles;
     std::vector<double> sampleRates;
 
-    void paint(juce::Graphics& g) override
+    void paint(Graphics& g) override
     {
         g.fillAll(juce::Colours::black);
         g.setColour(juce::Colours::white);
         g.setFont(24.f);
-		g.drawFittedText(text, getLocalBounds(), juce::Justification::centred, 1);
+		g.drawFittedText(text, getLocalBounds(), Just::centred, 1);
     }
 
     bool isInterestedInFileDrag(const StringArray& files) override
@@ -66,11 +66,11 @@ struct MainComponent  :
 
     bool isAudioFile(const String& fileName)
     {
-		auto ext = fileName.fromLastOccurrenceOf(".", false, false);
+		const auto ext = fileName.fromLastOccurrenceOf(".", false, false);
 		return ext == "flac" || ext == "wav" || ext == "mp3" || ext == "aiff";
     }
 
-    void filesDropped(const StringArray& files, int x, int y) override
+    void filesDropped(const StringArray& files, int, int) override
     {
         const auto numTracks = files.size();
 		tracks.resize(numTracks);
@@ -82,7 +82,7 @@ struct MainComponent  :
         auto minPeak = 1.f;
         auto maxPeak = 0.f;
 
-        auto seperatorString = File::getSeparatorString();
+        const auto seperatorString = File::getSeparatorString();
 
         for (auto i = 0; i < numTracks; ++i)
         {
@@ -90,7 +90,7 @@ struct MainComponent  :
             auto& trackTitle = trackTitles[i];
             auto& Fs = sampleRates[i];
             const auto& file = files[i];
-			destPath = file.upToLastOccurrenceOf(seperatorString, false, false) + "\\BatchNormalizeOutput\\";
+			destPath = file.upToLastOccurrenceOf(seperatorString, false, false) + "\\Normalized\\";
             loadAudioFile(file, track, Fs);
 			
 			trackTitle = file.fromLastOccurrenceOf(seperatorString, false, false);
@@ -150,8 +150,8 @@ struct MainComponent  :
 		auto reader = formatManager->createReaderFor(file);
 		if (reader != nullptr)
 		{
-			auto numSamples = reader->lengthInSamples;
-			auto numChannels = reader->numChannels;
+			const auto numSamples = static_cast<int>(reader->lengthInSamples);
+            const auto numChannels = reader->numChannels;
 			sampleRate = reader->sampleRate;
 			buffer.setSize(numChannels, numSamples);
 			reader->read(&buffer, 0, numSamples, 0, true, true);
